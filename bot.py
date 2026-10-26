@@ -1,43 +1,33 @@
 ﻿import time
 import json
-import numpy as np
-from vision import VisionPoseEstimator
 
-class SchrodingerBotSystem:
-    """
-    Upgraded autonomous vehicle state machine with decoupled perception,
-    asynchronous execution, and telemetry logging.
-    """
+class TransformerStateMachine:
     def __init__(self):
-        self.state = "IDLE"
-        self.vision = VisionPoseEstimator()
+        self.state = "ROBOT_PATROL"
+        self.morph_progress = 0.0
         self.telemetry_log = []
 
-    def step(self, frame):
+    def update(self, is_observed):
         start_time = time.time()
         
-        found, tvec, rvec = self.vision.get_pose(frame)
-        
-        if found:
-            self.state = "ACTIVE_TRACKING"
-            cmd_velocity = -0.5 * tvec[0:2]
+        if is_observed:
+            self.state = "VEHICLE_DISGUISE"
+            self.morph_progress = min(1.0, self.morph_progress + 0.1)
         else:
-            self.state = "SEARCHING"
-            cmd_velocity = np.zeros(2)
+            self.state = "ROBOT_PATROL"
+            self.morph_progress = max(0.0, self.morph_progress - 0.1)
             
-        latency_ms = (time.time() - start_time) * 1000.0
+        latency = (time.time() - start_time) * 1000.0
         
-        log_entry = {
+        self.telemetry_log.append({
             "timestamp": time.time(),
             "state": self.state,
-            "latency_ms": latency_ms,
-            "pose": tvec.tolist() if found else None
-        }
-        self.telemetry_log.append(log_entry)
+            "morph_progress": self.morph_progress,
+            "latency_ms": latency
+        })
         
-        return self.state, cmd_velocity
+        return self.state, self.morph_progress
 
     def save_telemetry(self, filename="telemetry_log.json"):
         with open(filename, "w") as f:
             json.dump(self.telemetry_log, f, indent=4)
-
