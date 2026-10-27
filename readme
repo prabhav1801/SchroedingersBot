@@ -1,0 +1,28 @@
+# Schrödinger's Bot 🤖👁️
+
+A hybrid Python/C++ simulation exploring the **Quantum Observer Effect** in distributed robotics. Schrödinger's Bot is an autonomous agent that patrols in a bipedal robot state; however, the moment an external observer is detected via a C++ ROS 2 vision-pose node, the "observer effect" collapses its state into a covert vehicle disguise.
+
+---
+
+## 🛠️ Project Architecture
+
+- **`vision_node.cpp`**: C++ ROS 2 node executing metric OpenCV 6-DOF ArUco pose estimation (`solvePnP`) and publishing velocity commands (`geometry_msgs/Twist`).
+- **`CMakeLists.txt` & `package.xml`**: ROS 2 package configuration and build files for dependency management.
+- **`run_test.py`**: Python test runner interfacing the telemetry and state-transition 3D visualization.
+- **`vision.py`**: Real-time computer vision module.
+- **`bot.py`**: Core state machine managing autonomous patrol loops and telemetry logging (`telemetry_log.json`).
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+Ensure you have Python installed along with the required dependencies for the local simulation:
+```bash
+pip install opencv-python ursina numpy
+```
+
+### 2. Running the Python Simulation
+Connect your webcam and execute the test runner:
+```bash
+python run_test.py
