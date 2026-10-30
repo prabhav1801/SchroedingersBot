@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.8)
 project(schrodingers_bot)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -15,7 +15,7 @@ ament_target_dependencies(vision_node rclcpp geometry_msgs OpenCV)
 
 install(TARGETS
   vision_node
-  DESTINATION lib/
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_package()

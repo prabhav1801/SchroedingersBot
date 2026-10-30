@@ -1,26 +1,27 @@
-﻿#include <rclcpp/rclcpp.hpp>
+#include <chrono>
+#include <functional>
+#include <memory>
+
+#include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <opencv2/opencv.hpp>
-#include <opencv2/aruco.hpp>
 
 class SchrodingerVisionNode : public rclcpp::Node {
 public:
     SchrodingerVisionNode() : Node("schrodinger_vision_node") {
-        // Publisher for robot velocity commands
         vel_pub_ = this->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 10);
-        
-        // 60Hz control loop timer
+
+        // ~60 Hz timer
         timer_ = this->create_wall_timer(
             std::chrono::milliseconds(16), 
             std::bind(&SchrodingerVisionNode::update_loop, this)
         );
 
-        // Open default webcam
         cap_.open(0);
         if (!cap_.isOpened()) {
-            RCLCPP_ERROR(this->get_node_logger(), "Failed to open video capture device!");
+            RCLCPP_ERROR(this->get_logger(), "Failed to open video capture device!");
         } else {
-            RCLCPP_INFO(this->get_node_logger(), "Vision node initialized successfully.");
+            RCLCPP_INFO(this->get_logger(), "Vision node initialized successfully.");
         }
     }
 
@@ -30,9 +31,10 @@ private:
         cap_ >> frame;
         if (frame.empty()) return;
 
-        // Placeholder for ArUco detection & 6-DOF solvePnP pose estimation
+        // TODO: ArUco detection + solvePnP pose estimation. Until then this publishes
+        // a constant forward velocity and does not use the frame.
         geometry_msgs::msg::Twist twist_msg;
-        twist_msg.linear.x = 0.5;  // Forward command during patrol
+        twist_msg.linear.x = 0.5;  // constant placeholder command
         twist_msg.angular.z = 0.0;
 
         vel_pub_->publish(twist_msg);
